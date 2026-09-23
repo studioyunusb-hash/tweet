@@ -1,0 +1,735 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tweet Kuyruğu</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@600;800&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap"
+    rel="stylesheet">
+  <style>
+    :root {
+      --ink: #12131a;
+      --ink-2: #1c1e2a;
+      --ink-3: #262939;
+      --paper: #efe9da;
+      --paper-dim: #cfc9bb;
+      --coral: #ff4b3e;
+      --coral-dark: #d63a2f;
+      --mustard: #ffc53d;
+      --text-hi: #f2f1ec;
+      --text-mid: #b7b9c8;
+      --text-low: #7d7f92;
+      --ok: #4fd67c;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      background: var(--ink);
+      color: var(--text-hi);
+      font-family: 'Inter', sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .page {
+      max-width: 1080px;
+      margin: 0 auto;
+      padding: 0 16px 60px;
+    }
+
+    /* ---------- HERO ---------- */
+    .hero {
+      padding: 48px 4px 28px;
+      border-bottom: 1px solid var(--ink-3);
+    }
+
+    .eyebrow {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 12px;
+      letter-spacing: .18em;
+      color: var(--mustard);
+      text-transform: uppercase;
+      margin-bottom: 14px;
+    }
+
+    h1 {
+      font-family: 'Big Shoulders Display', sans-serif;
+      font-weight: 800;
+      font-size: clamp(40px, 8vw, 84px);
+      line-height: .92;
+      margin: 0 0 18px;
+      letter-spacing: -.01em;
+      color: var(--text-hi);
+    }
+
+    h1 span {
+      color: var(--coral);
+    }
+
+    .lede {
+      max-width: 560px;
+      font-size: 16px;
+      line-height: 1.6;
+      color: var(--text-mid);
+      margin: 0;
+    }
+
+    /* ---------- GRID / TICKET CARDS ---------- */
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+
+    @media (max-width:720px) {
+      .grid {
+        grid-template-columns: 1fr;
+        gap: 10px;
+      }
+
+      .hero {
+        padding: 32px 0 20px;
+      }
+
+      .lede {
+        font-size: 14px;
+      }
+
+      .ticket-num {
+        flex: 0 0 42px;
+        font-size: 18px;
+      }
+
+      .ticket-body {
+        padding: 10px 12px;
+      }
+
+      .ticket-text {
+        font-size: 13px;
+      }
+
+      .ticket-meta {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 8px;
+      }
+
+      .actions {
+        flex-direction: column;
+        gap: 6px;
+      }
+
+      .btn {
+        min-height: 44px;
+        justify-content: center;
+        font-size: 14px;
+        padding: 10px 14px;
+      }
+    }
+
+    .ticket {
+      display: flex;
+      background: var(--ink-2);
+      border: 1px solid var(--ink-3);
+      border-radius: 10px;
+      overflow: hidden;
+      transition: border-color .15s ease, transform .15s ease;
+    }
+
+    .ticket:hover {
+      border-color: var(--coral);
+    }
+
+    .ticket.hidden {
+      display: none;
+    }
+
+    .ticket-num {
+      flex: 0 0 56px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Big Shoulders Display', sans-serif;
+      font-weight: 800;
+      font-size: 22px;
+      color: var(--ink);
+      background: var(--mustard);
+      border-right: 2px dashed var(--ink);
+      position: relative;
+    }
+
+    .ticket-body {
+      flex: 1;
+      padding: 14px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      min-width: 0;
+    }
+
+    .ticket-text {
+      font-size: 14px;
+      line-height: 1.55;
+      color: var(--text-hi);
+      word-wrap: break-word;
+      min-height: 6.2em;
+    }
+
+    .ticket-text .tag {
+      color: var(--coral);
+      font-weight: 600;
+    }
+
+    .ticket-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      margin-top: auto;
+    }
+
+    .charcount {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 11px;
+      color: var(--text-low);
+    }
+
+    .charcount.over {
+      color: var(--coral);
+    }
+
+    .actions {
+      display: flex;
+      gap: 8px;
+    }
+
+    .btn {
+      font-family: 'Inter', sans-serif;
+      font-weight: 600;
+      font-size: 12.5px;
+      border: none;
+      border-radius: 6px;
+      padding: 8px 12px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      text-decoration: none;
+      transition: transform .1s ease, opacity .15s ease;
+    }
+
+    .btn:active {
+      transform: scale(.96);
+    }
+
+    .btn-reply {
+      background: var(--coral);
+      color: #fff;
+    }
+
+    .btn-reply:hover {
+      background: var(--coral-dark);
+    }
+
+    .btn-reply:disabled,
+    .btn-reply[aria-disabled="true"],
+    .btn-reply.cooling {
+      background: var(--ink-3);
+      color: var(--text-low);
+      cursor: not-allowed;
+    }
+
+    .btn-sent {
+      background: var(--ok);
+      color: var(--ink);
+      cursor: default;
+    }
+
+    .btn-copy {
+      background: transparent;
+      color: var(--text-mid);
+      border: 1px solid var(--ink-3);
+    }
+
+    .btn-copy:hover {
+      color: var(--text-hi);
+      border-color: var(--text-mid);
+    }
+
+    .ticket.sent {
+      opacity: .45;
+      border-color: var(--ok);
+    }
+
+    .ticket.sent .ticket-num {
+      background: var(--ok);
+    }
+
+    .ticket.copied:not(.sent) {
+      opacity: .7;
+      border-color: var(--mustard);
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 60px 20px;
+      color: var(--text-low);
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 13px;
+    }
+
+    footer {
+      margin-top: 50px;
+      padding-top: 20px;
+      border-top: 1px solid var(--ink-3);
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 11px;
+      color: var(--text-low);
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      * {
+        transition: none !important;
+      }
+    }
+
+    .phase-notify {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(18, 19, 26, 0.85);
+      z-index: 9999;
+      opacity: 0;
+      transition: opacity .4s ease;
+      pointer-events: none;
+    }
+
+    .phase-notify.show {
+      opacity: 1;
+    }
+
+    .phase-notify span {
+      font-family: 'Big Shoulders Display', sans-serif;
+      font-weight: 800;
+      font-size: clamp(32px, 10vw, 72px);
+      color: var(--mustard);
+      text-align: center;
+      animation: notifyPulse .6s ease;
+    }
+
+    @keyframes notifyPulse {
+      0% {
+        transform: scale(0.7);
+        opacity: 0;
+      }
+
+      50% {
+        transform: scale(1.05);
+      }
+
+      100% {
+        transform: scale(1);
+        opacity: 1;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="page">
+
+    <header class="hero">
+      <h1>TWEET<br><span>KUYRUĞU</span></h1>
+      <div
+        style="display: flex; gap: 15px; margin-bottom: 12px; font-family: 'IBM Plex Mono', monospace; font-size: 14px; color: var(--mustard); font-weight: 600;">
+        <span id="current-phase-label">FAZ: 1</span>
+        <span id="timer-label">KALAN SÜRE: 07:00</span>
+      </div>
+      <p class="lede" id="hero-desc">Hazır tweetlerden birini seç, X'te butonuna bas, açılan pencereden tweetini gönder.
+      </p>
+    </header>
+
+    <main id="grid" class="grid"></main>
+
+    <footer>Bu sayfa tarayıcında çalışır, hiçbir veri sunucuya gönderilmez.</footer>
+  </div>
+
+  <script>
+    /* ============================================================
+       5 FAZLI SİSTEM
+       ============================================================ */
+    const phases = [
+      { id: 1, file: 'faz1.txt', campaignFile: 'campaign1.txt' },
+      { id: 2, file: 'faz2.txt', campaignFile: 'campaign2.txt' },
+      { id: 3, file: 'faz3.txt', campaignFile: 'campaign3.txt' },
+      { id: 4, file: 'faz4.txt', campaignFile: 'campaign4.txt' },
+      { id: 5, file: 'faz5.txt', campaignFile: 'campaign5.txt' }
+    ];
+    let currentPhaseIndex = 0;
+    let timeLeft = 0;
+    let phaseEndTime = 0;
+    let timerInterval = null;
+
+    const gridEl = document.getElementById('grid');
+    const phaseLabel = document.getElementById('current-phase-label');
+    const timerLabel = document.getElementById('timer-label');
+    const heroDesc = document.getElementById('hero-desc');
+    let campaignTweetId = null;
+
+    const SENT_KEY = 'tweetqueue_sent';
+    function getSent() { try { return JSON.parse(localStorage.getItem(SENT_KEY)) || []; } catch { return []; } }
+    function markSent(id) { const s = getSent(); if (!s.includes(id)) { s.push(id); localStorage.setItem(SENT_KEY, JSON.stringify(s)); } }
+    function isSent(id) { return getSent().includes(id); }
+
+    const COPIED_KEY = 'tweetqueue_copied';
+    function getCopied() { try { return JSON.parse(localStorage.getItem(COPIED_KEY)) || []; } catch { return []; } }
+    function markCopied(id) { const c = getCopied(); if (!c.includes(id)) { c.push(id); localStorage.setItem(COPIED_KEY, JSON.stringify(c)); } }
+    function isCopied(id) { return getCopied().includes(id); }
+
+    function extractTweetId(raw) {
+      if (!raw) return null;
+      const trimmed = raw.trim();
+      const idOnly = trimmed.match(/^\d{5,25}$/);
+      if (idOnly) return idOnly[0];
+      const fromUrl = trimmed.match(/status\/(\d{5,25})/);
+      if (fromUrl) return fromUrl[1];
+      return null;
+    }
+
+    async function loadPhase(index, isInit = false) {
+      if (index >= phases.length) {
+        index = 0; // Başa dön (Loop)
+      }
+      currentPhaseIndex = index;
+      const phase = phases[index];
+      phaseLabel.textContent = `FAZ: ${phase.id}`;
+
+      if (!isInit) {
+        phaseEndTime = Date.now() + 420000;
+      }
+      timeLeft = Math.max(0, Math.ceil((phaseEndTime - Date.now()) / 1000));
+
+      saveState();
+      updateTimerDisplay();
+
+      gridEl.innerHTML = '<div class="empty-state">Tweetler yükleniyor…</div>';
+      try {
+        const [tweetsRaw, campaignRaw] = await Promise.all([
+          fetch(phase.file).then(r => { if (!r.ok) throw new Error(`${phase.file} bulunamadı`); return r.text(); }),
+          fetch(phase.campaignFile).then(r => r.ok ? r.text() : null).catch(() => null)
+        ]);
+
+        campaignTweetId = extractTweetId(campaignRaw);
+        if (campaignRaw && campaignRaw.trim() && !campaignTweetId) {
+          console.warn(`${phase.campaignFile} içeriği tanınamadı, "${campaignRaw.trim()}" geçerli bir tweet ID/linki değil. Faz ${phase.id} "share" moduna düşürüldü.`);
+        }
+        phase.type = campaignTweetId ? 'reply' : 'share';
+
+        if (phase.type === 'reply') {
+          heroDesc.textContent = "Hazır tweetlerden birini seç, X'te yanıtla butonuna bas, açılan pencereden tweetini gönder.";
+        } else {
+          heroDesc.textContent = "Hazır tweetlerden birini seç, X'te paylaş butonuna bas, açılan pencereden tweetini gönder.";
+        }
+
+        const tweets = tweetsRaw
+          .split(/\r?\n/)
+          .map(s => s.trim())
+          .filter(Boolean)
+          .map((text, i) => ({ id: i + 1, text }));
+
+        /* Fisher-Yates */
+        for (let i = tweets.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [tweets[i], tweets[j]] = [tweets[j], tweets[i]];
+        }
+
+        render(tweets, phase);
+      } catch (err) {
+        const safeMsg = (err.message || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+        gridEl.innerHTML = `<div class="empty-state">Tweetler yüklenemedi. Faz ${phase.id} dosyasının aynı klasörde olduğundan emin ol.<br><br><em>(${safeMsg})</em></div>`;
+      }
+    }
+
+    const STATE_KEY = 'tweetqueue_state';
+    function saveState() {
+      localStorage.setItem(STATE_KEY, JSON.stringify({ phaseIndex: currentPhaseIndex, phaseEndTime: phaseEndTime }));
+    }
+    function randomStartState() {
+      return { phaseIndex: Math.floor(Math.random() * phases.length), phaseEndTime: Date.now() + 420000 };
+    }
+    function loadState() {
+      try {
+        const saved = JSON.parse(localStorage.getItem(STATE_KEY));
+        if (saved && typeof saved.phaseIndex === 'number' && typeof saved.phaseEndTime === 'number') {
+          if (saved.phaseIndex < 0 || saved.phaseIndex >= phases.length) {
+            return randomStartState();
+          }
+          return saved;
+        }
+      } catch (e) { }
+      /* İlk ziyarette her cihaz/tarayıcı rastgele bir fazdan başlasın, oradan
+         itibaren normal sırayla (loadPhase'deki loop mantığıyla) devam etsin. */
+      return randomStartState();
+    }
+
+    function startTimer() {
+      clearInterval(timerInterval);
+      timerInterval = setInterval(() => {
+        const remaining = Math.ceil((phaseEndTime - Date.now()) / 1000);
+        timeLeft = Math.max(0, remaining);
+        updateTimerDisplay();
+        if (timeLeft <= 0) {
+          showPhaseNotification();
+          loadPhase(currentPhaseIndex + 1);
+        }
+      }, 250);
+    }
+
+    function updateTimerDisplay() {
+      const m = Math.floor(timeLeft / 60).toString().padStart(2, '0');
+      const s = (timeLeft % 60).toString().padStart(2, '0');
+      timerLabel.textContent = `KALAN SÜRE: ${m}:${s}`;
+    }
+
+    function showPhaseNotification() {
+      const nextIndex = (currentPhaseIndex + 1) >= phases.length ? 0 : currentPhaseIndex + 1;
+      const overlay = document.createElement('div');
+      overlay.className = 'phase-notify';
+      overlay.innerHTML = `<span>FAZ ${phases[nextIndex].id} BAŞLADI!</span>`;
+      document.body.appendChild(overlay);
+      requestAnimationFrame(() => overlay.classList.add('show'));
+      setTimeout(() => {
+        overlay.classList.remove('show');
+        setTimeout(() => overlay.remove(), 400);
+      }, 2000);
+    }
+
+    function highlightTags(text) {
+      return text
+        .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+        .replace(/([#@][\wÇĞİÖŞÜçğıöşü_]+)/g, '<span class="tag">$1</span>');
+    }
+
+    function buildReplyUrl(text) {
+      const params = new URLSearchParams({
+        in_reply_to: campaignTweetId,
+        text: text
+      });
+      return 'https://x.com/intent/tweet?' + params.toString();
+    }
+
+    function buildShareUrl(text) {
+      const params = new URLSearchParams({
+        text: text
+      });
+      return 'https://x.com/intent/tweet?' + params.toString();
+    }
+
+    function render(list, phase) {
+      gridEl.innerHTML = '';
+      if (list.length === 0) {
+        gridEl.innerHTML = '<div class="empty-state">Aramanla eşleşen tweet yok.</div>';
+        return;
+      }
+      /* Gönderilmiş/kopyalanmış tweetleri alta at: sent > copied > kullanılmamış */
+      function rank(t) {
+        const id = `p${phase.id}_${t.id}`;
+        if (isSent(id)) return 2;
+        if (isCopied(id)) return 1;
+        return 0;
+      }
+      list.sort((a, b) => rank(a) - rank(b));
+      const frag = document.createDocumentFragment();
+      list.forEach(t => {
+        const card = document.createElement('article');
+        const phaseSpecificId = `p${phase.id}_${t.id}`;
+        const sent = isSent(phaseSpecificId);
+        const copied = isCopied(phaseSpecificId);
+        card.className = 'ticket' + (sent ? ' sent' : '') + (copied ? ' copied' : '');
+        const over = t.text.length > 280;
+
+        let replyDisabled = false;
+        if (phase.type === 'reply' && !campaignTweetId) {
+          replyDisabled = true;
+        }
+        if (sent) replyDisabled = true;
+
+        const replyClass = sent ? 'btn btn-sent' : 'btn btn-reply';
+        const replyLabel = sent ? 'Gönderildi ✓' : (phase.type === 'reply' ? "X'te Yanıtla" : "X'te Paylaş");
+        /* Android'de intent/tweet'in in_reply_to parametresi X uygulaması
+           tarafından yok sayılıyor; bunun yerine metni panoya kopyalayıp
+           doğrudan asıl tweetin sayfasını açıyoruz (bkz. click handler). */
+        const isAndroidReply = isAndroid && phase.type === 'reply';
+        const actionUrl = isAndroidReply
+          ? `https://x.com/i/status/${campaignTweetId}`
+          : (phase.type === 'reply' ? buildReplyUrl(t.text) : buildShareUrl(t.text));
+
+        card.innerHTML = `
+      <div class="ticket-num">${String(t.id).padStart(2, '0')}</div>
+      <div class="ticket-body">
+        <div class="ticket-text">${highlightTags(t.text)}</div>
+        <div class="ticket-meta">
+          <span class="charcount ${over ? 'over' : ''}">${t.text.length}/280</span>
+          <div class="actions">
+            <button class="btn btn-copy" data-copy="${encodeURIComponent(t.text)}" data-id="${phaseSpecificId}">Kopyala</button>
+            <a class="${replyClass}" href="${replyDisabled ? '#' : actionUrl}" data-id="${phaseSpecificId}" data-copytext="${encodeURIComponent(t.text)}" data-android-reply="${isAndroidReply}" data-label="${replyLabel}" ${replyDisabled ? 'aria-disabled="true"' : ''}>${replyLabel}</a>
+          </div>
+        </div>
+      </div>`;
+        frag.appendChild(card);
+      });
+      gridEl.appendChild(frag);
+      applyCooldownState();
+    }
+
+    const isAndroid = /Android/i.test(navigator.userAgent);
+    const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+
+    /* iOS/masaüstünde butonlar gerçek <a href> linkleri olarak doğal
+       tıklama davranışıyla açılıyor (X'in intent/tweet sayfası orada
+       in_reply_to'yu doğru işliyor). Android'de X uygulaması bu parametreyi
+       güvenilir şekilde desteklemediği için (denenen tüm otomatik reply
+       teknikleri profile düz tweet olarak düşüyor), Android'e özel olarak
+       metni panoya kopyalayıp doğrudan asıl tweetin sayfasını açıyoruz. */
+    function finalizeSent(replyBtn, id) {
+      markSent(id);
+      const card = replyBtn.closest('.ticket');
+      card.classList.add('sent');
+      replyBtn.className = 'btn btn-sent';
+      replyBtn.removeAttribute('href');
+      replyBtn.textContent = 'Gönderildi ✓';
+      startCooldown();
+    }
+
+    /* İki tweet arasında en az 5 saniye bekletip spama düşmeyi önlüyoruz. */
+    const COOLDOWN_MS = 5000;
+    let cooldownUntil = 0;
+    let cooldownInterval = null;
+
+    function applyCooldownState() {
+      const remaining = cooldownUntil - Date.now();
+      if (remaining <= 0) return;
+      document.querySelectorAll('.btn-reply:not([aria-disabled="true"]):not(.btn-sent)').forEach(btn => {
+        btn.classList.add('cooling');
+        btn.textContent = `Bekle ${Math.ceil(remaining / 1000)}s`;
+      });
+    }
+
+    function startCooldown() {
+      cooldownUntil = Date.now() + COOLDOWN_MS;
+      applyCooldownState();
+      clearInterval(cooldownInterval);
+      cooldownInterval = setInterval(() => {
+        const remaining = cooldownUntil - Date.now();
+        const coolingBtns = document.querySelectorAll('.btn-reply.cooling');
+        if (remaining <= 0) {
+          clearInterval(cooldownInterval);
+          coolingBtns.forEach(btn => {
+            btn.classList.remove('cooling');
+            btn.textContent = btn.dataset.label;
+          });
+          return;
+        }
+        coolingBtns.forEach(btn => { btn.textContent = `Bekle ${Math.ceil(remaining / 1000)}s`; });
+      }, 250);
+    }
+
+    gridEl.addEventListener('click', (e) => {
+      const replyBtn = e.target.closest('.btn-reply');
+      if (replyBtn) {
+        if (replyBtn.getAttribute('aria-disabled') === 'true' || replyBtn.classList.contains('cooling')) {
+          e.preventDefault();
+          return;
+        }
+        const id = replyBtn.dataset.id;
+
+        if (replyBtn.dataset.androidReply === 'true') {
+          e.preventDefault();
+          const text = decodeURIComponent(replyBtn.dataset.copytext);
+          navigator.clipboard?.writeText(text).catch(() => { });
+          window.open(replyBtn.href, '_blank');
+          finalizeSent(replyBtn, id);
+        } else if (!isMobile) {
+          e.preventDefault();
+          window.open(replyBtn.href, '_blank', 'noopener,noreferrer,width=550,height=420');
+          finalizeSent(replyBtn, id);
+        } else {
+          /* Mobilde (iOS) varsayılan davranışa dokunmuyoruz (preventDefault
+             yok); tarayıcı linki gerçek href'iyle işlesin diye DOM
+             güncellemesini navigasyon tetiklendikten sonraya (setTimeout ile
+             bir sonraki task'a) erteliyoruz. */
+          setTimeout(() => finalizeSent(replyBtn, id), 0);
+        }
+        return;
+      }
+      const copyBtn = e.target.closest('.btn-copy');
+      if (copyBtn) {
+        const text = decodeURIComponent(copyBtn.dataset.copy);
+        const restoreLabel = copyBtn.textContent;
+        const id = copyBtn.dataset.id;
+        if (id && !isCopied(id)) {
+          markCopied(id);
+          const card = copyBtn.closest('.ticket');
+          card.classList.add('copied');
+          gridEl.appendChild(card);
+        }
+        navigator.clipboard?.writeText(text).then(() => {
+          copyBtn.textContent = 'Kopyalandı ✓';
+          setTimeout(() => copyBtn.textContent = restoreLabel, 1400);
+        }).catch(() => {
+          copyBtn.textContent = 'Kopyalanamadı';
+          setTimeout(() => copyBtn.textContent = restoreLabel, 1400);
+        });
+      }
+    });
+
+    async function init() {
+      try {
+        const versionRaw = await fetch('version.txt').then(r => r.ok ? r.text() : 'v1');
+        const currentVersion = versionRaw.trim();
+        const savedVersion = localStorage.getItem('tweetqueue_version');
+        if (savedVersion && savedVersion !== currentVersion) {
+          localStorage.removeItem('tweetqueue_sent');
+          localStorage.removeItem('tweetqueue_state');
+        }
+        localStorage.setItem('tweetqueue_version', currentVersion);
+      } catch (e) { }
+
+      const state = loadState();
+      let initPhase = state.phaseIndex;
+      phaseEndTime = state.phaseEndTime;
+
+      const remaining = Math.ceil((phaseEndTime - Date.now()) / 1000);
+      if (remaining <= 0) {
+        initPhase = (initPhase + 1) % phases.length;
+        phaseEndTime = Date.now() + 420000;
+      }
+      timeLeft = Math.max(0, Math.ceil((phaseEndTime - Date.now()) / 1000));
+
+      loadPhase(initPhase, true);
+      startTimer();
+    }
+
+    init();
+  </script>
+
+</body>
+
+</html>
